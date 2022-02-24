@@ -67,15 +67,15 @@ public class Solution {
         }
 
         projectsList.sort((p1, p2) -> {
-            if (p1.score == p2.score) {
-                if (p1.bestBefore == p2.bestBefore) {
+            if (p1.bestBefore == p2.bestBefore) {
+                if (p1.score == p2.score) {
                     return p1.roles.stream().map(role -> role.level).reduce(0, Integer::sum) - p2.roles.stream().map(role -> role.level).reduce(0, Integer::sum);
                 }
 
-                return p1.bestBefore - p2.bestBefore;
+                return p2.score - p1.score;
             }
 
-            return p2.score - p1.score;
+            return p2.bestBefore - p1.bestBefore;
         });
         Map<String, Project> projects = projectsList.stream().collect(Collectors.toMap(project -> project.name, project -> project));
         Set<String> todoProjects = new HashSet<>(projects.keySet());
@@ -99,7 +99,19 @@ public class Solution {
                         Optional<Skill> availableContributor = skillContributors.stream()
                                 .filter(skill ->
                                         !skill.busy &&
-                                                skill.level >= role.level &&
+                                                (
+                                                        skill.level >= role.level
+                                                                || (
+                                                                (skill.level + 1) == role.level
+                                                                        && skillContributors
+                                                                        .stream()
+                                                                        .anyMatch(con -> toBeReservedContributors.values()
+                                                                                .stream()
+                                                                                .anyMatch(sCon -> con.level >= role.level && con.contributor.equals(sCon.contributor))
+                                                                        )
+                                                        )
+
+                                                ) &&
                                                 !toBeReservedContributors.containsKey(skill.contributor))
                                 .findFirst();
                         if (availableContributor.isPresent()) {
