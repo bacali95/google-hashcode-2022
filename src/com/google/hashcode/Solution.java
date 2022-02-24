@@ -34,7 +34,6 @@ public class Solution {
 
         Map<String, List<Skill>> skills = new HashMap<>();
 
-        List<String> contributors = new ArrayList<>();
         for (int i = 0; i < c; i++) {
             tokens = in.readLine().split(" +");
             String contributorName = tokens[0];
@@ -44,7 +43,6 @@ public class Solution {
                 skills.putIfAbsent(tokens[0], new ArrayList<>());
                 skills.get(tokens[0]).add(new Skill(tokens[0], contributorName, Integer.parseInt(tokens[1])));
             }
-            contributors.add(tokens[0]);
         }
 
         for (List<Skill> skillList : skills.values()) {
@@ -69,15 +67,15 @@ public class Solution {
         }
 
         projectsList.sort((p1, p2) -> {
-            if (p1.bestBefore == p2.bestBefore) {
-                if (p1.score == p2.score) {
+            if (p1.score == p2.score) {
+                if (p1.bestBefore == p2.bestBefore) {
                     return p1.roles.stream().map(role -> role.level).reduce(0, Integer::sum) - p2.roles.stream().map(role -> role.level).reduce(0, Integer::sum);
                 }
 
-                return p2.score - p1.score;
+                return p1.bestBefore - p2.bestBefore;
             }
 
-            return p1.bestBefore - p2.bestBefore;
+            return p2.score - p1.score;
         });
         Map<String, Project> projects = projectsList.stream().collect(Collectors.toMap(project -> project.name, project -> project));
         Set<String> todoProjects = new HashSet<>(projects.keySet());
