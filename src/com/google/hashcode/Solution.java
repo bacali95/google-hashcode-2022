@@ -8,11 +8,11 @@ public class Solution {
 
     public static void main(String[] args) throws IOException {
         File dir = new File("./files/in");
-        ProcessBuilder builder = new ProcessBuilder("zip", "-r", "files/source", "src");
-        builder.directory(new File("."));
-        builder.start();
+//        ProcessBuilder builder = new ProcessBuilder("zip", "-r", "files/source", "src");
+//        builder.directory(new File("."));
+//        builder.start();
         List<File> files = Arrays.stream(Objects.requireNonNull(dir.listFiles()))
-//                .filter(file -> file.getName().startsWith("b_"))
+//                .filter(file -> file.getName().startsWith("f_"))
                 .filter(file -> file.getName().endsWith(".txt"))
                 .sorted(Comparator.comparingInt(f -> f.getName().charAt(0)))
                 .collect(Collectors.toList());
@@ -69,7 +69,7 @@ public class Solution {
         projectsList.sort((p1, p2) -> {
             if (p1.bestBefore == p2.bestBefore) {
                 if (p1.score == p2.score) {
-                    return p1.roles.stream().map(role -> role.level).reduce(0, Integer::sum) - p2.roles.stream().map(role -> role.level).reduce(0, Integer::sum);
+                    return p2.roles.stream().map(role -> role.level).reduce(0, Integer::sum) - p1.roles.stream().map(role -> role.level).reduce(0, Integer::sum);
                 }
 
                 return p2.score - p1.score;
@@ -99,19 +99,7 @@ public class Solution {
                         Optional<Skill> availableContributor = skillContributors.stream()
                                 .filter(skill ->
                                         !skill.busy &&
-                                                (
-                                                        skill.level >= role.level
-                                                                || (
-                                                                (skill.level + 1) == role.level
-                                                                        && skillContributors
-                                                                        .stream()
-                                                                        .anyMatch(con -> toBeReservedContributors.values()
-                                                                                .stream()
-                                                                                .anyMatch(sCon -> con.level >= role.level && con.contributor.equals(sCon.contributor))
-                                                                        )
-                                                        )
-
-                                                ) &&
+                                                skill.level >= role.level &&
                                                 !toBeReservedContributors.containsKey(skill.contributor))
                                 .findFirst();
                         if (availableContributor.isPresent()) {
