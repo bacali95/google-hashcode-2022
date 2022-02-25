@@ -7,12 +7,13 @@ import java.util.stream.Collectors;
 public class Solution {
 
     public static void main(String[] args) throws IOException {
-        File dir = new File("./files/in");
-//        ProcessBuilder builder = new ProcessBuilder("zip", "-r", "files/source", "src");
-//        builder.directory(new File("."));
-//        builder.start();
-        List<File> files = Arrays.stream(Objects.requireNonNull(dir.listFiles()))
-//                .filter(file -> file.getName().startsWith("f_"))
+        File inDir = new File("./files/in");
+        File outDir = new File("./files/out");
+        outDir.mkdir();
+        ProcessBuilder builder = new ProcessBuilder("zip", "-r", "files/out/source", "src");
+        builder.directory(new File("."));
+        builder.start();
+        List<File> files = Arrays.stream(Objects.requireNonNull(inDir.listFiles()))
                 .filter(file -> file.getName().endsWith(".txt"))
                 .sorted(Comparator.comparingInt(f -> f.getName().charAt(0)))
                 .collect(Collectors.toList());
@@ -35,7 +36,7 @@ public class Solution {
         Map<String, List<Skill>> skills = new HashMap<>();
 
         for (int i = 0; i < c; i++) {
-            tokens = in.readLine().split(" +");
+            tokens = in.readLine().split(" ");
             String contributorName = tokens[0];
             int numberOfSkills = Integer.parseInt(tokens[1]);
             for (int j = 0; j < numberOfSkills; j++) {
@@ -75,7 +76,7 @@ public class Solution {
                 return p2.score - p1.score;
             }
 
-            return p2.bestBefore - p1.bestBefore;
+            return p1.bestBefore - p2.bestBefore;
         });
         Map<String, Project> projects = projectsList.stream().collect(Collectors.toMap(project -> project.name, project -> project));
         Set<String> todoProjects = new HashSet<>(projects.keySet());
@@ -98,8 +99,7 @@ public class Solution {
                     if (skillContributors != null) {
                         Optional<Skill> availableContributor = skillContributors.stream()
                                 .filter(skill ->
-                                        !skill.busy &&
-                                                skill.level >= role.level &&
+                                        !skill.busy && skill.level >= role.level &&
                                                 !toBeReservedContributors.containsKey(skill.contributor))
                                 .findFirst();
                         if (availableContributor.isPresent()) {
